@@ -15,10 +15,14 @@ Use this index to choose the Reddit action that matches the user request, then o
 - **user-profile** — Extract visible profile metadata and recent visible user activity from a Reddit user page. Full spec: [references/user-profile.md](references/user-profile.md).
 - **current-user-list** — Extract visible items from logged-in personal Reddit lists such as saved, upvoted, downvoted, hidden, and history. Full spec: [references/current-user-list.md](references/current-user-list.md).
 - **submit-comment** *(write action — requires login + explicit user consent)* — Post a top-level comment on a Reddit post, or reply to a specific parent comment, under the logged-in account. Verifies the comment appears in the DOM before reporting success; detects rate-limit and removal toasts. Full spec: [references/submit-comment.md](references/submit-comment.md).
+- **upvote-post** *(write — requires login + consent)* — Toggle the upvote on the loaded Reddit post. Returns already-voted state without acting unless `force:true`. Full spec: [references/upvote-post.md](references/upvote-post.md).
+- **upvote-comment** *(write — requires login + consent)* — Toggle the upvote on a specific comment by fullname id. Full spec: [references/upvote-comment.md](references/upvote-comment.md).
+- **delete-own-comment** *(destructive write — requires login + consent)* — Delete a comment owned by the logged-in account. Permanent. Full spec: [references/delete-own-comment.md](references/delete-own-comment.md).
 
 ## Notes
 
-- **Read vs. write.** All actions on this page are **read-only except `submit-comment`**. The read actions do not vote, save, hide, join communities, send messages, or change account settings. Only `submit-comment` writes — and only when explicitly invoked with an approved body and target.
+- **Read vs. write.** Six of these are read-only; four are write actions (`submit-comment`, `upvote-post`, `upvote-comment`, `delete-own-comment`). Read actions do not vote, save, hide, join communities, send messages, or change account settings. Write actions are clearly tagged in the action index above and require explicit user consent + DOM verification per the write-action policy.
+- **Reply to a comment:** use `submit-comment` with `parentCommentId: "t1_<id>"`. There is no separate `reply-to-comment` action — `submit-comment` covers both top-level and reply cases.
 - **Logged-in actions.** `current-user-list` and `submit-comment` require the user's existing browser session. They cannot log in. Prefer Chrome Bridge for these.
 - **Virtualized feeds.** Reddit virtualizes long feeds. Each read action extracts currently loaded visible items; scroll or load more before running when the user needs deeper coverage.
 - **Challenge pages.** Prefer Chrome Bridge when the page depends on the user's existing logged-in Chrome session or when Reddit presents a challenge page to new browser contexts.
